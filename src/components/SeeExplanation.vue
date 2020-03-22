@@ -2,7 +2,7 @@
   <v-card>
     <v-container fluid>
       <!-- Text -->
-      <template v-if="!isEditing"> 
+      <template v-if="!isEditing">
         <p v-html="expl.html"></p>
       </template>
       <template v-else>

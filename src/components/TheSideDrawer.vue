@@ -56,10 +56,11 @@
           <v-list-item v-for="(post, i) in posts" :key="post.id + i"
             :to="`/class/${classId}/posts/${post.id}`"
             three-line color="accent"
+            :class="post.answered? 'answered': 'not-answered'"
           >
             <v-list-item-content>
-              <v-list-item-subtitle class="text--primary" v-text="post.title || '(No title)'"/>
-              <v-list-item-subtitle v-text="displayDate(post.date)"/>
+              <v-list-item-subtitle class="black--text" v-text="post.title || '(No title)'"/>
+              <v-list-item-subtitle>{{displayDate(post.date)}}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
@@ -98,10 +99,10 @@ export default {
     const roomRef = db.doc(`rooms/${this.classId}`);
     const tutorialPostRef = db.doc(`classes/${tutorial.classId}/posts/${tutorial.postId}`);
     const postsRef = db.collection(`classes/${this.classId}/posts`);
-    const postsQuery = postsRef.orderBy("date", "desc").limit(50);
+    // console.log(postsRef)
     // this.tutorialPost = await this.$_getDoc(tutorialPostRef);
     this.unsubscribeRoomListener = await this.$_listenToDoc(roomRef, this, "room");
-    this.unsubscribePostsListener = await this.$_listenToCollection(postsQuery, this, "posts");;
+    this.unsubscribePostsListener = await this.$_listenToCollection(postsRef, this, "posts");;
   },
   destroyed () {
     this.unsubscribeRoomListener();
@@ -114,3 +115,14 @@ export default {
   }
 };
 </script>
+<style>
+.v-list-item.not-answered {
+  background: rgba(255,150,150,0.2);
+}
+.v-list-item--active.v-list-item.not-answered {
+  background: none;
+}
+.v-list-item--active:before {
+  opacity: 0.3 !important;
+}
+</style>

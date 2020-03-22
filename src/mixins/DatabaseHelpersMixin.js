@@ -48,10 +48,17 @@ export default {
     async $_listenToCollection (ref, obj, val) {
       return new Promise(async (resolve) => {
         try {
-          const unsubscribeListener = ref.onSnapshot(querySnapshot => { // onSnapshot does NOT return a promise
+          const query = ref.orderBy("date", "desc").limit(50);
+          const unsubscribeListener = query.onSnapshot(querySnapshot => { // onSnapshot does NOT return a promise
             const resultDocs = [];
-            querySnapshot.forEach((doc) => { 
-              resultDocs.push({...doc.data(), "id": doc.id, "ref": doc.ref.path })
+            querySnapshot.forEach((doc) => {
+              let docData = {...doc.data(), "id": doc.id, "ref": doc.ref.path }
+              if (val==="posts") {
+                ref.doc(doc.id).collection('explanations').get().then(querySnapshot=>{
+                  docData['answered'] = querySnapshot.size > 0;
+                })
+              }
+              resultDocs.push(docData);
             });
             obj[val] = resultDocs;
             resolve(unsubscribeListener);
